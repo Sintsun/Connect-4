@@ -3,113 +3,222 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Interface for a Connect Four game.
- */
+
 public interface ConnectFour {
 
-    // Enum for players in the game
+    // The mark for two game players
     public enum Player {X, O}
     
     /**
-     * Initializes the 6x7 game grid, clearing any existing tokens.
+     * This method initialize the 6x7 grid. When it is called, the grid 
+     * is re-initialized and all tokens currently on the grid are erased. 
      */
     public void init(); 
     
     /**
-     * Checks if the game can continue.
-     * @return true if the game is ongoing, false if there's a winner or the grid is full.
+     * This method returns true if the game can continue. It returns false if a winner has
+     * been determined or all grid positions have been filled.
      */
     public boolean hasNext();
     
     /**
-     * Gets the player whose turn is next.
-     * @return the current player.
+     * This method returns the player of the current turn. 
      */
     public Player getTurn();
 
     /**
-     * Drops the current player's token into the specified column.
+     * This method drops a token of the current player in the specified column.
      * 
-     * @param col the column number (0 to 6).
-     * @throws IllegalArgumentException if the column number is invalid.
-     * @throws IllegalStateException if the column is already full.
+     * @param col                           the column number ranging from 0 to 6 
+     * @throws IllegalArgumentException     if the input column is out of the range
+     * @throw IllegalStateException         if the input column is full
      */
     public void drop(int col) throws IllegalArgumentException, IllegalStateException;
 
     /**
-     * Displays the current state of the grid to the console.
-     * Empty cells are shown as underscores, and the column numbers are shown at the bottom.
+     * This method prints the current grid state to the console (i.e. System.out).
+     * The grid cells are either printed with a player's token or an underscore when
+     * the position is empty. The column numbers are printed at the bottom of the grid.
+     * 
+     * For example, an initial look of a 6x7 grid with underscores in all cells:
+     * |_|_|_|_|_|_|_|
+     * |_|_|_|_|_|_|_|
+     * |_|_|_|_|_|_|_|
+     * |_|_|_|_|_|_|_|
+     * |_|_|_|_|_|_|_|
+     * |_|_|_|_|_|_|_|
+     * |0|1|2|3|4|5|6|
+     * 
+     * Another example with 3 Xs and 2 Os.
+     * |_|_|_|_|_|_|_|
+     * |_|_|_|_|_|_|_|
+     * |_|_|_|_|_|_|_|
+     * |_|_|_|_|_|_|_|
+     * |_|_|_|X|O|_|_|
+     * |X|_|_|X|O|_|_|
+     * |0|1|2|3|4|5|6|
      */
     public void print();
 
     /**
-     * Determines if there is a winner.
-     * @return true if a winner exists, false otherwise.
+     * This method returns true if the game has a winner. It returns false when the game
+     * is still in progress or there is no winner.
      */
     public boolean hasWinner();
     
     /**
-     * Gets the winner of the game.
+     * This method returns the winner of the game.
      * 
-     * @return the player who has won.
-     * @throws IllegalStateException if the game is still ongoing or if there's no winner.
+     * @return                              the winner of the game
+     * @throws IllegalStateException        if the game is in progress or has no winner
      */
     public Player getWinner() throws IllegalStateException;
     
-    /**
-     * Creates a new ConnectFour instance using the student's ID.
-     * 
-     * @param sid the student's ID.
-     * @return a new instance of ConnectFour.
-     */
-    public static ConnectFour newInstance(String sid) {
-        ConnectFour instance = null;
-        try {
-            Class clazz = Class.forName("a2223.hw2.ConnectFour" + sid);
-            instance = (ConnectFour) clazz.getDeclaredConstructor().newInstance();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(ConnectFour.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            return instance;
-        }
-    }
-    
-    /**
-     * Main method to start the Connect Four game.
-     * Prompts the user for their student ID to initialize the game.
-     */
-    public static void main(String[] args) {
-        Scanner sin = new Scanner(System.in);  
-        
-        System.out.print("Enter your SID: ");
-        ConnectFour game = newInstance(sin.next());
-        game.init();
-        System.out.println("");
-                
-        game.print();
-        while(game.hasNext()) {
-            while(true) {
-                try {
-                    System.out.print("Drop " + game.getTurn() + " at: ");
-                    game.drop(sin.nextInt());
-                    break;
-                } catch(IllegalArgumentException e) {
-                    System.out.println("Invalid column. Please choose a column between 0 and 6.");
-                } catch(InputMismatchException e) {
-                    System.out.println("Invalid input. Please enter a number.");
-                    sin.nextLine();
+
+public static ConnectFour newInstance() {
+    return new ConnectFour() {
+        private char[][] grid = new char[6][7];
+        private Player currentPlayer = Player.X;
+
+        @Override
+        public void init() {
+            for (int i = 0; i < 6; i++) {
+                for (int j = 0; j < 7; j++) {
+                    grid[i][j] = '_';
                 }
             }
-            
-            System.out.println("");
-            game.print();
+            currentPlayer = Player.X;
         }
-        
-        if(game.hasWinner())
+
+        @Override
+        public boolean hasNext() {
+            for (int i = 0; i < 7; i++) {
+                if (grid[0][i] == '_') {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public Player getTurn() {
+            return currentPlayer;
+        }
+
+        @Override
+        public void drop(int col) throws IllegalArgumentException, IllegalStateException {
+            if (col < 0 || col >= 7) {
+                throw new IllegalArgumentException("Invalid column");
+            }
+
+            for (int i = 5; i >= 0; i--) {
+                if (grid[i][col] == '_') {
+                    grid[i][col] = getTurn() == Player.X ? 'X' : 'O';
+                    currentPlayer = (currentPlayer == Player.X) ? Player.O : Player.X;
+                    return;
+                }
+            }
+
+            throw new IllegalStateException("Column is full");
+        }
+
+        @Override
+        public void print() {
+            for (int i = 0; i < 6; i++) {
+                System.out.print("|");
+                for (int j = 0; j < 7; j++) {
+                    System.out.print(grid[i][j] + "|");
+                }
+                System.out.println();
+            }
+            System.out.println("|0|1|2|3|4|5|6|");
+        }
+
+        @Override
+        public boolean hasWinner() {
+            // Check for horizontal wins
+            for (int i = 0; i < 6; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (grid[i][j] != '_' && grid[i][j] == grid[i][j + 1] && grid[i][j] == grid[i][j + 2] && grid[i][j] == grid[i][j + 3]) {
+                        return true;
+                    }
+                }
+            }
+
+            // Check for vertical wins
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 7; j++) {
+                    if (grid[i][j] != '_' && grid[i][j] == grid[i + 1][j] && grid[i][j] == grid[i + 2][j] && grid[i][j] == grid[i + 3][j]) {
+                        return true;
+                    }
+                }
+            }
+
+            // Check for diagonal wins (top-left to bottom-right)
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if (grid[i][j] != '_' && grid[i][j] == grid[i + 1][j + 1] && grid[i][j] == grid[i + 2][j + 2] && grid[i][j] == grid[i + 3][j + 3]) {
+                        return true;
+                    }
+                }
+            }
+
+            // Check for diagonal wins (top-right to bottom-left)
+            for (int i = 0; i < 3; i++) {
+                for (int j = 6; j >= 3; j--) {
+                    if (grid[i][j] != '_' && grid[i][j] == grid[i + 1][j - 1] && grid[i][j] == grid[i + 2][j - 2] && grid[i][j] == grid[i + 3][j - 3]) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        @Override
+        public Player getWinner() throws IllegalStateException {
+            if (hasWinner()) {
+                return (currentPlayer == Player.X) ? Player.O : Player.X;
+            } else {
+                throw new IllegalStateException("Game is in progress or has no winner");
+            }
+        }
+    };
+}
+    
+
+   
+public static void main(String[] args) {
+    Scanner sin = new Scanner(System.in);
+
+    ConnectFour game = newInstance();
+    game.init();
+    System.out.println("");
+
+    game.print();
+    while (game.hasNext()) {
+        while (true) {
+            try {
+                System.out.print("Drop " + game.getTurn() + " at: ");
+                game.drop(sin.nextInt());
+                break;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Wrong column.");
+            } catch (InputMismatchException e) {
+                System.out.println("Wrong input.");
+                sin.nextLine();
+            }
+        }
+
+        System.out.println("");
+        game.print();
+
+        if (game.hasWinner()) {
             System.out.println("The winner is " + game.getWinner() + " !!!");
-        else
-            System.out.println("DRAW game!");
+            return; // Exit the main method after declaring the winner
+        }
     }
 
+    System.out.println("DRAW game!");
+}
 }
