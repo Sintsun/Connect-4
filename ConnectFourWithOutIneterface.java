@@ -1,3 +1,4 @@
+package a2223.hw2;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.logging.Level;
