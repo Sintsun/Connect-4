@@ -1,6 +1,7 @@
 # Connect Four Game
 
 This project implements the classic Connect Four game with a graphical user interface.
+![image](https://github.com/user-attachments/assets/286fee4c-ec12-4ba2-a33f-cb40e2391211)
 
 ## Overview
 
@@ -9,15 +10,14 @@ Connect Four is a two-player connection game in which players first choose a col
 ## Project Structure
 
 - **ConnectFour.java**: Interface defining the core game logic.
-- **ConnectFourXXXXXXXX.java**: Implementation of the ConnectFour interface.
-- **ConnectFourGuiXXXXXXXX.java**: GUI for the Connect Four game using Java Swing.
+- **ConnectFourGui.java**: GUI for the Connect Four game using Java Swing.
 
 ## How to Run
 
 1. Clone the repository.
 2. Ensure you have Java installed on your system.
 3. Compile the Java files.
-4. Run the `ConnectFourGuiXXXXXXXX` class to start the game.
+4. Run the `ConnectFourGui` class to start the game.
 
 ## Features
 
@@ -38,9 +38,7 @@ Connect Four is a two-player connection game in which players first choose a col
 
 ## Author
 
-- Developed for the EE3206 Assignment 3.
+- Developed for the  Assignment.
 
-## License
 
-This project is licensed under the MIT License.
-![image](https://github.com/user-attachments/assets/286fee4c-ec12-4ba2-a33f-cb40e2391211)
+
